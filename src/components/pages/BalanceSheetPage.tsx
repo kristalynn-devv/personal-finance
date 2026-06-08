@@ -638,7 +638,7 @@ export default function BalanceSheetPage() {
                             </>
                           )}
                         </TableCell>
-                        <TableCell className="text-right">{l.interestRate}%</TableCell>
+                        <TableCell className="text-right font-mono">{l.interestRate}%</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(l.minimumPayment)}</TableCell>
                         <TableCell>
                           <div className="flex gap-1 justify-end">
@@ -723,7 +723,7 @@ export default function BalanceSheetPage() {
                             <TableCell className="font-medium text-sm">{l.name}</TableCell>
                             <TableCell><Badge variant="outline" className="text-xs">ปิดแล้ว</Badge></TableCell>
                             <TableCell className="text-right text-xs text-muted-foreground">{formatCurrency(l.originalAmount)}</TableCell>
-                            <TableCell className="text-right">{l.interestRate}%</TableCell>
+                            <TableCell className="text-right font-mono">{l.interestRate}%</TableCell>
                             <TableCell />
                             <TableCell>
                               <div className="flex gap-1 justify-end">

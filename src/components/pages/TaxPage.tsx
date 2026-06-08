@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useBudget, budgetAvgMonthly } from "@/store"
 import { calcTaxPayable } from "@/lib/calculations"
 import { formatCurrency, formatPercent } from "@/lib/format"
@@ -32,10 +32,15 @@ function bracketTax(taxableIncome: number, bracket: typeof BRACKETS[0]): number 
 }
 
 export default function TaxPage() {
-  const { entries } = useBudget()
-  const defaultSalary = Math.round(budgetAvgMonthly(entries, "income") * 12)
+  const { entries, loaded } = useBudget()
+  const [income, setIncome] = useState({ salary: 0, business: 0, dividend: 0, rental: 0 })
+  const [salaryInitialized, setSalaryInitialized] = useState(false)
 
-  const [income, setIncome] = useState({ salary: defaultSalary, business: 0, dividend: 0, rental: 0 })
+  useEffect(() => {
+    if (!loaded || salaryInitialized) return
+    const s = Math.round(budgetAvgMonthly(entries, "income") * 12)
+    if (s > 0) { setIncome((i) => ({ ...i, salary: s })); setSalaryInitialized(true) }
+  }, [loaded, entries.length])
   const [ded, setDed] = useState({
     lifeInsurance: 0, healthInsurance: 0, pvd: 0, ssf: 0, rmf: 0, thaiEsg: 0, donation: 0, socialSecurity: 0, spouseAllowance: 0, children: 0, parents: 0, homeLoanInterest: 0,
   })
