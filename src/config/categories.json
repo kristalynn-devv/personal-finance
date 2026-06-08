@@ -1,0 +1,28 @@
+{
+  "assetCategories": [
+    { "value": "liquid",     "label": "สภาพคล่อง",  "desc": "เงินสด, ออมทรัพย์, ฝากประจำ" },
+    { "value": "investment", "label": "การลงทุน",   "desc": "หุ้น, กองทุน, PVD" },
+    { "value": "personal",   "label": "ส่วนตัว",    "desc": "บ้าน, รถ, ของมีค่า" }
+  ],
+
+  "liabilityTypes": [
+    { "value": "credit_card",    "label": "บัตรเครดิต",              "defaultRate": 0 },
+    { "value": "personal_loan",  "label": "สินเชื่อส่วนบุคคล",       "defaultRate": 0 },
+    { "value": "mortgage",       "label": "บ้าน / สินเชื่อที่อยู่อาศัย", "defaultRate": 0 },
+    { "value": "car",            "label": "รถยนต์",                  "defaultRate": 0  },
+    { "value": "student_loan",   "label": "กยศ.",                    "defaultRate": 0  }
+  ],
+
+  "budgetCategories": [
+    { "value": "income",           "label": "รายรับ",          "color": "text-emerald-600" },
+    { "value": "bonus",            "label": "โบนัส/พิเศษ",    "color": "text-teal-600"   },
+    { "value": "saving",           "label": "เงินออม",         "color": "text-blue-600"   },
+    { "value": "fixed_expense",    "label": "รายจ่ายคงที่",    "color": "text-orange-600" },
+    { "value": "variable_expense", "label": "รายจ่ายผันแปร",   "color": "text-red-500"    }
+  ],
+
+  "debtStrategies": [
+    { "value": "avalanche", "label": "Avalanche (ดอกเบี้ยสูงก่อน)" },
+    { "value": "snowball",  "label": "Snowball (ยอดน้อยก่อน)"      }
+  ]
+}
