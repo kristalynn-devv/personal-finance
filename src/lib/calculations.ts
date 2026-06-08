@@ -164,13 +164,19 @@ export function calcFinancialHealth(
   const emergencyFund = monthlyExpenses > 0 ? liquidAssets / monthlyExpenses : 0
   const netWorth = totalAssets - totalLiabilities
 
+  const hasData = monthlyIncome > 0 || totalAssets > 0 || totalLiabilities > 0
+
   const savingsStatus: "good" | "warning" | "danger" = savingsRate >= 10 ? "good" : savingsRate >= 5 ? "warning" : "danger"
-  const debtStatus: "good" | "warning" | "danger" = debtToIncome < 36 ? "good" : debtToIncome < 43 ? "warning" : "danger"
+  const debtStatus: "good" | "warning" | "danger" = monthlyIncome > 0
+    ? (debtToIncome < 36 ? "good" : debtToIncome < 43 ? "warning" : "danger")
+    : (totalLiabilities === 0 ? "good" : "danger")
   const emergencyStatus: "good" | "warning" | "danger" = emergencyFund >= 6 ? "good" : emergencyFund >= 3 ? "warning" : "danger"
-  const netWorthStatus: "good" | "warning" | "danger" = netWorth > 0 ? "good" : netWorth === 0 ? "warning" : "danger"
+  const netWorthStatus: "good" | "warning" | "danger" = netWorth > 0 ? "good" : netWorth < 0 ? "danger" : "warning"
 
   const score = (s: "good" | "warning" | "danger") => (s === "good" ? 25 : s === "warning" ? 12 : 0)
-  const totalScore = score(savingsStatus) + score(debtStatus) + score(emergencyStatus) + score(netWorthStatus)
+  const totalScore = hasData
+    ? score(savingsStatus) + score(debtStatus) + score(emergencyStatus) + score(netWorthStatus)
+    : 0
 
   return {
     savingsRate,

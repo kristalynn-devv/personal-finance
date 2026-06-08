@@ -3,6 +3,8 @@ import "../styles/global.css"
 import { DataLoader } from "@/components/DataLoader"
 import { AiAdvisor } from "@/components/AiAdvisor"
 import { SonnerToaster } from "@/components/SonnerToaster"
+import { AuthGuard } from "@/components/AuthGuard"
+import { UserMenu } from "@/components/UserMenu"
 const { title = "วางแผนการเงิน" } = Astro.props
 const pathname = Astro.url.pathname
 
@@ -58,6 +60,7 @@ function isActive(href: string) {
     <title>{title}</title>
   </head>
   <body class="bg-background text-foreground antialiased">
+    <AuthGuard client:only="react">
     <div class="flex min-h-screen">
 
       <!-- Sidebar (desktop) -->
@@ -94,8 +97,8 @@ function isActive(href: string) {
         </nav>
 
         <!-- Footer -->
-        <div class="px-3 py-3 space-y-1" style="border-top: 1px solid var(--sidebar-border);">
-          <p class="text-[11px] text-center px-2" style="color: var(--sidebar-foreground); opacity: 0.4;">ข้อมูลเก็บใน Supabase</p>
+        <div class="px-3 py-3" style="border-top: 1px solid var(--sidebar-border);">
+          <UserMenu client:only="react" />
         </div>
       </aside>
 
@@ -122,6 +125,7 @@ function isActive(href: string) {
         ))}
       </nav>
     </div>
+    </AuthGuard>
 
     <style>
       .nav-active {
