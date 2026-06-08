@@ -205,7 +205,6 @@ export async function generatePageInsight(context: string, question: string, pag
 
 export async function generateBehaviorAnalysis(
   liabilityLogs: { liabilityName: string; eventType: string; balanceBefore: number | null; balanceAfter: number | null; createdAt: string }[],
-  auditLogs: { tableName: string; action: string; recordName: string | null; createdAt: string }[],
   assets: Asset[], liabilities: Liability[], entries: BudgetEntry[], profile: Profile, retirement: Retirement
 ): Promise<string> {
   const d = buildFinancialContext(assets, liabilities, entries, profile, retirement)
@@ -221,19 +220,21 @@ export async function generateBehaviorAnalysis(
     return Math.max(1, Math.round((Date.now() - oldest.getTime()) / (1000 * 60 * 60 * 24 * 30)))
   })()
 
-  const debtNames = [...new Set(liabilityLogs.filter(l => l.eventType === "payment").map(l => l.liabilityName))]
-  const addedItems = auditLogs.filter(l => l.action === "create")
-  const deletedItems = auditLogs.filter(l => l.action === "delete")
+  const debtNames = [...new Set(payments.map(l => l.liabilityName))]
+  const byDebt = debtNames.map(name => {
+    const logs = payments.filter(l => l.liabilityName === name)
+    const paid = logs.reduce((s, l) => s + (l.balanceBefore ?? 0) - (l.balanceAfter ?? 0), 0)
+    return `${name}: ชำระ ${logs.length} ครั้ง รวม ${formatCurrency(paid)}`
+  })
 
   const context = [
     `ข้อมูลการเงิน: Net Worth ${formatCurrency(d.netWorth)} | รายได้ ${formatCurrency(d.monthlyIncome)}/เดือน | ออม ${d.savingsRatePct.toFixed(1)}% | สุขภาพการเงิน ${d.health.score}/100`,
-    `หนี้: ${liabilities.length} รายการ ยอดรวม ${formatCurrency(d.totalLiabilities)} | ขั้นต่ำ/เดือน ${formatCurrency(d.monthlyDebt)}`,
-    `พฤติกรรมการชำระหนี้ (${monthsActive} เดือนที่ผ่านมา):`,
-    `  - ชำระรวม ${payments.length} ครั้ง รวม ${formatCurrency(totalPaid)}`,
-    totalWithdrawn > 0 ? `  - ถอนเพิ่ม ${withdrawals.length} ครั้ง รวม ${formatCurrency(totalWithdrawn)}` : "",
-    debtNames.length > 0 ? `  - หนี้ที่ชำระสม่ำเสมอ: ${debtNames.join(", ")}` : "  - ยังไม่มีประวัติการชำระ",
-    addedItems.length > 0 ? `เพิ่มข้อมูล ${addedItems.length} รายการ (${addedItems.map(a => a.tableName).join(", ")})` : "",
-    deletedItems.length > 0 ? `ลบข้อมูล ${deletedItems.length} รายการ` : "",
+    `หนี้ปัจจุบัน: ${liabilities.length} รายการ ยอดรวม ${formatCurrency(d.totalLiabilities)} | ขั้นต่ำ/เดือน ${formatCurrency(d.monthlyDebt)}`,
+    `ประวัติการชำระหนี้ (${monthsActive} เดือนที่ผ่านมา):`,
+    payments.length > 0
+      ? `  ชำระรวม ${payments.length} ครั้ง ${formatCurrency(totalPaid)}\n` + byDebt.map(b => `  - ${b}`).join("\n")
+      : `  ยังไม่มีประวัติการชำระ`,
+    totalWithdrawn > 0 ? `ถอน/กู้เพิ่ม: ${withdrawals.length} ครั้ง รวม ${formatCurrency(totalWithdrawn)}` : "",
   ].filter(Boolean).join("\n")
 
   const result = await callRaw([

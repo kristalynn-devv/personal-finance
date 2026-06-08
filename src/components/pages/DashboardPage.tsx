@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { Scale, CreditCard, BarChart3, TrendingUp } from "lucide-react"
 import { generateBehaviorAnalysis } from "@/lib/ai"
-import { dbLoadAllLiabilityLogs, dbLoadAuditLogs, type AuditLog, type LiabilityLog } from "@/lib/db"
+import { dbLoadAllLiabilityLogs, type LiabilityLog } from "@/lib/db"
 
 export default function DashboardPage() {
   const { items: assets } = useAssets()
@@ -21,21 +21,17 @@ export default function DashboardPage() {
 
   const aiCtx = useAiAdvisorContext()
   const [liabilityLogs, setLiabilityLogs] = useState<LiabilityLog[]>([])
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
   const [behaviorResult, setBehaviorResult] = useState<string | null>(() => {
     try { return localStorage.getItem("behavior_analysis_result") } catch { return null }
   })
   const [behaviorLoading, setBehaviorLoading] = useState(false)
 
   useEffect(() => {
-    Promise.all([dbLoadAllLiabilityLogs(200), dbLoadAuditLogs(200)]).then(([ll, al]) => {
-      setLiabilityLogs(ll)
-      setAuditLogs(al)
-    })
+    dbLoadAllLiabilityLogs(200).then(setLiabilityLogs)
   }, [])
 
   const generateBehavior = () => generateBehaviorAnalysis(
-    liabilityLogs, auditLogs, assets, liabilities, entries,
+    liabilityLogs, assets, liabilities, entries,
     { name: profile.name, age: profile.age, retirementAge: profile.retirementAge, lifeExpectancy: profile.lifeExpectancy, inflationRate: profile.inflationRate },
     { monthlyExpenseAtRetirement: retirement.monthlyExpenseAtRetirement, investmentReturn: retirement.investmentReturn, currentPvdBalance: retirement.currentPvdBalance, pvdRate: retirement.pvdRate, employerRate: retirement.employerRate, monthlyDcaAmount: retirement.monthlyDcaAmount, otherMonthlyIncome: retirement.otherMonthlyIncome }
   )
@@ -54,7 +50,7 @@ export default function DashboardPage() {
   // auto-run only when no cached result exists
   useEffect(() => {
     if (!hasData || behaviorResult || behaviorLoading) return
-    if (liabilityLogs.length === 0 && auditLogs.length === 0) return
+    if (liabilityLogs.length === 0) return
     setBehaviorLoading(true)
     generateBehavior().then((result) => {
       setBehaviorResult(result)
