@@ -3,9 +3,8 @@ import { supabase, signOut } from "@/lib/supabase"
 import type { User } from "@supabase/supabase-js"
 import { LogOut } from "lucide-react"
 
-export function UserMenu() {
+function useUser() {
   const [user, setUser] = useState<User | null>(null)
-
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user ?? null))
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -13,6 +12,51 @@ export function UserMenu() {
     })
     return () => subscription.unsubscribe()
   }, [])
+  return user
+}
+
+export function UserMenuMobile() {
+  const user = useUser()
+  const [open, setOpen] = useState(false)
+  if (!user) return null
+  const avatar = user.user_metadata?.avatar_url as string | undefined
+  const name = user.user_metadata?.full_name ?? user.email ?? ""
+  return (
+    <>
+      <button onClick={() => setOpen(true)} className="flex flex-col items-center gap-1.5">
+        {avatar
+          ? <img src={avatar} alt={name} className="rounded-full object-cover" style={{ width: 22, height: 22 }} referrerPolicy="no-referrer" />
+          : <div className="rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ width: 22, height: 22, background: "var(--primary)" }}>{name[0]?.toUpperCase()}</div>
+        }
+        <span className="text-[10px] font-medium text-muted-foreground whitespace-nowrap">บัญชี</span>
+      </button>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={() => setOpen(false)}>
+          <div className="bg-card border-t border-border rounded-t-2xl p-4 space-y-3" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3 pb-3 border-b border-border">
+              {avatar
+                ? <img src={avatar} alt={name} className="w-10 h-10 rounded-full object-cover" referrerPolicy="no-referrer" />
+                : <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ background: "var(--primary)" }}>{name[0]?.toUpperCase()}</div>
+              }
+              <div className="min-w-0">
+                <p className="text-sm font-semibold truncate">{name}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+            </div>
+            <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition-colors">
+              <LogOut className="w-4 h-4" />
+              ออกจากระบบ
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+export function UserMenu() {
+  const user = useUser()
 
   if (!user) return null
 

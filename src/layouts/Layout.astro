@@ -4,7 +4,7 @@ import { DataLoader } from "@/components/DataLoader"
 import { AiAdvisor } from "@/components/AiAdvisor"
 import { SonnerToaster } from "@/components/SonnerToaster"
 import { AuthGuard } from "@/components/AuthGuard"
-import { UserMenu } from "@/components/UserMenu"
+import { UserMenu, UserMenuMobile } from "@/components/UserMenu"
 const { title = "วางแผนการเงิน" } = Astro.props
 const pathname = Astro.url.pathname
 
@@ -111,18 +111,23 @@ function isActive(href: string) {
       </main>
 
       <!-- Bottom nav (mobile) -->
-      <nav class="md:hidden fixed bottom-0 inset-x-0 z-20 flex border-t" style="background: var(--card); border-color: var(--border);">
-        {nav.slice(0, 5).map((item) => (
-          <a
-            href={item.href}
-            class={`flex-1 flex flex-col items-center py-2.5 gap-1 text-[10px] font-medium transition-colors ${
-              isActive(item.href) ? "text-primary" : "text-muted-foreground"
-            }`}
-          >
-            <span class="flex-shrink-0" set:html={item.icon} />
-            <span>{item.label.split("-")[0].replace("สินทรัพย์", "สินทรัพย์")}</span>
-          </a>
-        ))}
+      <nav class="md:hidden fixed bottom-0 inset-x-0 z-20 border-t overflow-x-auto" style="background: var(--card); border-color: var(--border);">
+        <div class="flex min-w-max px-1">
+          {nav.map((item) => (
+            <a
+              href={item.href}
+              class={`flex flex-col items-center px-3 py-2.5 gap-1.5 text-[10px] font-medium transition-colors min-w-[60px] ${
+                isActive(item.href) ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <span class="flex-shrink-0 [&>svg]:w-[22px] [&>svg]:h-[22px]" set:html={item.icon} />
+              <span class="whitespace-nowrap">{item.label}</span>
+            </a>
+          ))}
+          <div class="flex flex-col items-center px-3 py-2.5 gap-1.5 min-w-[60px]">
+            <UserMenuMobile client:only="react" />
+          </div>
+        </div>
       </nav>
     </div>
     </AuthGuard>
