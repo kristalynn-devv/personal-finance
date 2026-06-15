@@ -56,7 +56,7 @@ export default function DashboardPage() {
       setBehaviorResult(result)
       localStorage.setItem("behavior_analysis_result", result)
     }).catch(() => {}).finally(() => setBehaviorLoading(false))
-  }, [liabilityLogs.length, auditLogs.length])
+  }, [liabilityLogs.length])
 
   const monthlyIncome = budgetAvgMonthly(entries, "income")
   const monthlySavings = budgetAvgMonthly(entries, "saving")
