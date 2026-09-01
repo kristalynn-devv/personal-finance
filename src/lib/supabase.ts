@@ -19,11 +19,15 @@ export async function getSession() {
 export async function signInWithGoogle() {
   await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: window.location.origin },
+    options: {
+      redirectTo: window.location.origin,
+      queryParams: { prompt: "select_account" },
+    },
   })
 }
 
 export async function signOut() {
   await supabase.auth.signOut()
+  localStorage.removeItem("behavior_analysis_result")
   window.location.href = "/"
 }
