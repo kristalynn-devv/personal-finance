@@ -55,7 +55,7 @@
 }
 
 @theme inline {
-  --font-sans: 'Noto Sans Thai', sans-serif;
+  --font-sans: 'Noto Sans Thai Looped', sans-serif;
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
@@ -98,7 +98,7 @@
 }
 
 :root {
-  --font-sans: 'Noto Sans Thai', sans-serif;
+  --font-sans: 'Noto Sans Thai Looped', sans-serif;
   --font-size-base: 15px;
 }
 
