@@ -571,31 +571,55 @@ export default function BalanceSheetPage() {
           {assets.items.length === 0 ? (
             <p className="text-center py-8 text-muted-foreground text-sm">ยังไม่มีข้อมูลสินทรัพย์</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ชื่อ</TableHead>
-                  <TableHead>ประเภท</TableHead>
-                  <TableHead className="text-right">มูลค่า</TableHead>
-                  <TableHead className="w-20" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Cards (mobile) */}
+              <div className="md:hidden space-y-2">
                 {assets.items.map((a) => (
-                  <TableRow key={a.id}>
-                    <TableCell className="font-medium">{a.name}</TableCell>
-                    <TableCell><Badge variant="secondary">{catLabel(a.category)}</Badge></TableCell>
-                    <TableCell className="text-right font-mono">{formatCurrency(a.value)}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-1 justify-end">
-                        <Button size="icon" variant="ghost" onClick={() => setAssetDialog({ open: true, item: a })}><Pencil className="w-3.5 h-3.5" /></Button>
-                        <Button size="icon" variant="ghost" className="text-destructive" onClick={() => { assets.remove(a.id); toast.success("ลบสินทรัพย์แล้ว") }}><Trash2 className="w-3.5 h-3.5" /></Button>
+                  <div key={a.id} className="rounded-xl border border-border p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate">{a.name}</p>
+                        <Badge variant="secondary" className="mt-1">{catLabel(a.category)}</Badge>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                      <p className="font-mono text-sm flex-shrink-0">{formatCurrency(a.value)}</p>
+                    </div>
+                    <div className="flex gap-1 justify-end mt-2 -mb-1 -mr-1">
+                      <Button size="icon" variant="ghost" onClick={() => setAssetDialog({ open: true, item: a })}><Pencil className="w-3.5 h-3.5" /></Button>
+                      <Button size="icon" variant="ghost" className="text-destructive" onClick={() => { assets.remove(a.id); toast.success("ลบสินทรัพย์แล้ว") }}><Trash2 className="w-3.5 h-3.5" /></Button>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+
+              {/* Table (desktop) */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ชื่อ</TableHead>
+                      <TableHead>ประเภท</TableHead>
+                      <TableHead className="text-right">มูลค่า</TableHead>
+                      <TableHead className="w-20" />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {assets.items.map((a) => (
+                      <TableRow key={a.id}>
+                        <TableCell className="font-medium">{a.name}</TableCell>
+                        <TableCell><Badge variant="secondary">{catLabel(a.category)}</Badge></TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(a.value)}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1 justify-end">
+                            <Button size="icon" variant="ghost" onClick={() => setAssetDialog({ open: true, item: a })}><Pencil className="w-3.5 h-3.5" /></Button>
+                            <Button size="icon" variant="ghost" className="text-destructive" onClick={() => { assets.remove(a.id); toast.success("ลบสินทรัพย์แล้ว") }}><Trash2 className="w-3.5 h-3.5" /></Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -611,47 +635,85 @@ export default function BalanceSheetPage() {
             <p className="text-center py-8 text-muted-foreground text-sm">ยังไม่มีข้อมูลหนี้สิน</p>
           ) : (
             <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ชื่อ</TableHead>
-                    <TableHead>ประเภท</TableHead>
-                    <TableHead className="text-right">คงเหลือ / ตั้งต้น</TableHead>
-                    <TableHead className="text-right">ดอกเบี้ย</TableHead>
-                    <TableHead className="text-right">ขั้นต่ำ/เดือน</TableHead>
-                    <TableHead className="w-24" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {activeDebts.map((l) => {
-                    const pct = l.originalAmount > 0 ? Math.max(0, Math.min(100, (1 - l.balance / l.originalAmount) * 100)) : 0
-                    return (
-                      <TableRow key={l.id}>
-                        <TableCell className="font-medium">{l.name}</TableCell>
-                        <TableCell><Badge variant="secondary">{typeLabel(l.type)}</Badge></TableCell>
-                        <TableCell className="text-right">
-                          <span className="font-mono text-red-500">{formatCurrency(l.balance)}</span>
+              {/* Cards (mobile) */}
+              <div className="md:hidden space-y-2">
+                {activeDebts.map((l) => {
+                  const pct = l.originalAmount > 0 ? Math.max(0, Math.min(100, (1 - l.balance / l.originalAmount) * 100)) : 0
+                  return (
+                    <div key={l.id} className="rounded-xl border border-border p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm truncate">{l.name}</p>
+                          <Badge variant="secondary" className="mt-1">{typeLabel(l.type)}</Badge>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="font-mono text-sm text-red-500">{formatCurrency(l.balance)}</p>
                           {l.originalAmount > 0 && (
-                            <>
-                              <span className="text-muted-foreground text-xs"> / {formatCurrency(l.originalAmount)}</span>
-                              <Progress value={pct} className="h-1 mt-1 w-24 ml-auto" />
-                            </>
+                            <p className="text-muted-foreground text-xs">/ {formatCurrency(l.originalAmount)}</p>
                           )}
-                        </TableCell>
-                        <TableCell className="text-right font-mono">{l.interestRate}%</TableCell>
-                        <TableCell className="text-right font-mono">{formatCurrency(l.minimumPayment)}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-1 justify-end">
-                            <Button size="icon" variant="ghost" onClick={() => setLogDialog(l)} title="ประวัติ"><History className="w-3.5 h-3.5" /></Button>
-                            <Button size="icon" variant="ghost" onClick={() => setLiabilityDialog({ open: true, item: l })}><Pencil className="w-3.5 h-3.5" /></Button>
-                            <Button size="icon" variant="ghost" className="text-destructive" onClick={() => { liabilities.remove(l.id); toast.success("ลบหนี้สินแล้ว") }}><Trash2 className="w-3.5 h-3.5" /></Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+                        </div>
+                      </div>
+                      {l.originalAmount > 0 && <Progress value={pct} className="h-1 mt-2" />}
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex gap-4 text-xs text-muted-foreground">
+                          <span>ดอกเบี้ย <span className="font-mono text-foreground">{l.interestRate}%</span></span>
+                          <span>ขั้นต่ำ/เดือน <span className="font-mono text-foreground">{formatCurrency(l.minimumPayment)}</span></span>
+                        </div>
+                        <div className="flex gap-1 -mb-1 -mr-1">
+                          <Button size="icon" variant="ghost" onClick={() => setLogDialog(l)} title="ประวัติ"><History className="w-3.5 h-3.5" /></Button>
+                          <Button size="icon" variant="ghost" onClick={() => setLiabilityDialog({ open: true, item: l })}><Pencil className="w-3.5 h-3.5" /></Button>
+                          <Button size="icon" variant="ghost" className="text-destructive" onClick={() => { liabilities.remove(l.id); toast.success("ลบหนี้สินแล้ว") }}><Trash2 className="w-3.5 h-3.5" /></Button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Table (desktop) */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ชื่อ</TableHead>
+                      <TableHead>ประเภท</TableHead>
+                      <TableHead className="text-right">คงเหลือ / ตั้งต้น</TableHead>
+                      <TableHead className="text-right">ดอกเบี้ย</TableHead>
+                      <TableHead className="text-right">ขั้นต่ำ/เดือน</TableHead>
+                      <TableHead className="w-24" />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {activeDebts.map((l) => {
+                      const pct = l.originalAmount > 0 ? Math.max(0, Math.min(100, (1 - l.balance / l.originalAmount) * 100)) : 0
+                      return (
+                        <TableRow key={l.id}>
+                          <TableCell className="font-medium">{l.name}</TableCell>
+                          <TableCell><Badge variant="secondary">{typeLabel(l.type)}</Badge></TableCell>
+                          <TableCell className="text-right">
+                            <span className="font-mono text-red-500">{formatCurrency(l.balance)}</span>
+                            {l.originalAmount > 0 && (
+                              <>
+                                <span className="text-muted-foreground text-xs"> / {formatCurrency(l.originalAmount)}</span>
+                                <Progress value={pct} className="h-1 mt-1 w-24 ml-auto" />
+                              </>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right font-mono">{l.interestRate}%</TableCell>
+                          <TableCell className="text-right font-mono">{formatCurrency(l.minimumPayment)}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-1 justify-end">
+                              <Button size="icon" variant="ghost" onClick={() => setLogDialog(l)} title="ประวัติ"><History className="w-3.5 h-3.5" /></Button>
+                              <Button size="icon" variant="ghost" onClick={() => setLiabilityDialog({ open: true, item: l })}><Pencil className="w-3.5 h-3.5" /></Button>
+                              <Button size="icon" variant="ghost" className="text-destructive" onClick={() => { liabilities.remove(l.id); toast.success("ลบหนี้สินแล้ว") }}><Trash2 className="w-3.5 h-3.5" /></Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
 
               {/* Total row */}
               {activeDebts.length > 1 && (() => {
@@ -716,26 +778,54 @@ export default function BalanceSheetPage() {
                     หนี้ที่ปิดแล้ว ({closedDebts.length} รายการ)
                   </button>
                   {showClosed && (
-                    <Table>
-                      <TableBody>
+                    <>
+                      {/* Cards (mobile) */}
+                      <div className="md:hidden space-y-2 opacity-50">
                         {closedDebts.map((l) => (
-                          <TableRow key={l.id} className="opacity-50">
-                            <TableCell className="font-medium text-sm">{l.name}</TableCell>
-                            <TableCell><Badge variant="outline" className="text-xs">ปิดแล้ว</Badge></TableCell>
-                            <TableCell className="text-right text-xs text-muted-foreground">{formatCurrency(l.originalAmount)}</TableCell>
-                            <TableCell className="text-right font-mono">{l.interestRate}%</TableCell>
-                            <TableCell />
-                            <TableCell>
-                              <div className="flex gap-1 justify-end">
+                          <div key={l.id} className="rounded-xl border border-border p-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="font-medium text-sm truncate">{l.name}</p>
+                                <Badge variant="outline" className="text-xs mt-1">ปิดแล้ว</Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground flex-shrink-0">{formatCurrency(l.originalAmount)}</p>
+                            </div>
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-xs text-muted-foreground">ดอกเบี้ย <span className="font-mono">{l.interestRate}%</span></span>
+                              <div className="flex gap-1 -mb-1 -mr-1">
                                 <Button size="icon" variant="ghost" onClick={() => setLogDialog(l)} title="ประวัติ"><History className="w-3.5 h-3.5" /></Button>
                                 <Button size="icon" variant="ghost" onClick={() => setLiabilityDialog({ open: true, item: l })}><Pencil className="w-3.5 h-3.5" /></Button>
                                 <Button size="icon" variant="ghost" className="text-destructive" onClick={() => { liabilities.remove(l.id); toast.success("ลบหนี้สินแล้ว") }}><Trash2 className="w-3.5 h-3.5" /></Button>
                               </div>
-                            </TableCell>
-                          </TableRow>
+                            </div>
+                          </div>
                         ))}
-                      </TableBody>
-                    </Table>
+                      </div>
+
+                      {/* Table (desktop) */}
+                      <div className="hidden md:block">
+                        <Table>
+                          <TableBody>
+                            {closedDebts.map((l) => (
+                              <TableRow key={l.id} className="opacity-50">
+                                <TableCell className="font-medium text-sm">{l.name}</TableCell>
+                                <TableCell><Badge variant="outline" className="text-xs">ปิดแล้ว</Badge></TableCell>
+                                <TableCell className="text-right text-xs text-muted-foreground">{formatCurrency(l.originalAmount)}</TableCell>
+                                <TableCell className="text-right font-mono">{l.interestRate}%</TableCell>
+                                <TableCell />
+                                <TableCell>
+                                  <div className="flex gap-1 justify-end">
+                                    <Button size="icon" variant="ghost" onClick={() => setLogDialog(l)} title="ประวัติ"><History className="w-3.5 h-3.5" /></Button>
+                                    <Button size="icon" variant="ghost" onClick={() => setLiabilityDialog({ open: true, item: l })}><Pencil className="w-3.5 h-3.5" /></Button>
+                                    <Button size="icon" variant="ghost" className="text-destructive" onClick={() => { liabilities.remove(l.id); toast.success("ลบหนี้สินแล้ว") }}><Trash2 className="w-3.5 h-3.5" /></Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </>
                   )}
                 </div>
               )}
