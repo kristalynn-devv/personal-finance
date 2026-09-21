@@ -56,3 +56,7 @@ Then apply `schema.sql` and `rls.sql` to your Supabase project, in that order.
 
 Personal project, in active use. Single-user by design — there is no sharing, no multi-tenant
 concept, and none is planned.
+
+## License
+
+[MIT](./LICENSE) © 2026 Kristalyn Narongpiyawatha
